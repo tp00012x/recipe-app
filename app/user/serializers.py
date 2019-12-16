@@ -30,6 +30,17 @@ class AuthTokenSerializer(serializers.Serializer):
         trim_whitespace=False
     )
 
+    def update(self, instance, validated_data):
+        """Create a new user with encrypted password and return it"""
+        password = validated_data.pop('password', None)
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        return user
+
     def validate(self, attrs):
         """Validate and authenticate the user"""
         email = attrs.get('email')
